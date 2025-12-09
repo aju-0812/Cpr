@@ -18,18 +18,18 @@ Moves to the next stage only when the correct tag is detected.
 
 
 Direction Estimation:
-Based on the tag’s X-position in the frame:
+Based on the tag’s X-position in the frame
 
-TURN LEFT
-TURN RIGHT
-GO STRAIGHT
+TURN LEFT,
+TURN RIGHT,
+GO STRAIGHT.
 
 
 Single Window Output
 Displays:
 
-Live camera feed
-AprilTag ID and bounding box
-Navigation direction
-Current target tag
-Mission completion message
+Live camera feed,
+AprilTag ID and bounding box,
+Navigation direction,
+Current target tag,
+Mission completion message.
