@@ -1,0 +1,26 @@
+arena:
+  width: 9.0
+  height: 5.0
+
+obstacles:
+  - {x: 2.2, y: 1.5, r: 0.6}
+  - {x: 3.8, y: 3.2, r: 0.5}
+  - {x: 5.5, y: 1.8, r: 0.7}
+  - {x: 6.8, y: 3.0, r: 0.4}
+  - {x: 4.0, y: 4.0, r: 0.55}
+
+zones:
+  start:
+    type: "start"
+    rect: [0.5, 0.5, 2.5, 2.0] # x_min, y_min, x_max, y_max
+  excavation:
+    type: "danger"
+    polygon: [[5.0, 0.0], [9.0, 0.0], [9.0, 2.5], [5.5, 2.0]]
+  construction:
+    type: "safe"
+    circle: {x: 7.8, y: 4.2, r: 1.2}
+
+markers:
+  - {id: 0, x: 7.8, y: 4.2, type: "goal"}
+  - {id: 1, x: 6.2, y: 1.1, type: "landmark"}
+  - {id: 2, x: 8.3, y: 1.8, type: "landmark"}

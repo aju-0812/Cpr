@@ -1,0 +1,41 @@
+sim:
+  dt: 0.05
+  max_time: 120.0
+  visualization:
+    enabled: true
+    interval: 1  # Plot every N steps
+
+grid:
+  hex_size: 0.25  # meters (center to vertex)
+  bounds: [9.0, 5.0] # width, height
+
+planning:
+  weights:
+    alpha: 0.8   # Clearance weight
+    beta: 1.5    # Importance weight
+    gamma: 0.3   # Heading change weight
+  heuristic_scale: 1.0
+  smoothing:
+    sigma: 2.0   # Gaussian smoothing for importance field
+
+importance:
+  lambda1: 0.6   # Clearance
+  lambda2: 0.3   # Zone penalty
+  lambda3: 1.2   # Marker attraction
+  excavation_penalty: 0.6
+  construction_bonus: -0.4
+
+robot:
+  width: 1.5
+  length: 0.75
+  radius: 0.55   # Collision radius (inc safety)
+  planning_min_clearance: 0.25 # Minimum clearance for path planning (physical limit)
+  max_v: 1.0
+  max_w: 1.0     # rad/s
+  start_pose: [1.5, 1.0, 0.0] # x, y, yaw
+
+control:
+  lookahead: 1.0
+  obstacle_check_dist: 0.8
+  kp_v: 1.0
+  kp_w: 2.0

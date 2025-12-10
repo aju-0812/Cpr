@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Ignore large files and directories
+Rover_obj_detection/runs/
+Rover_obj_detection/data/
+*.pt
+*.onnx
