@@ -34,7 +34,7 @@ During notebook execution, it will be automatically organized into:
 **Install Requirements (Ultralytics)**
 !pip install ultralytics
 
-** Model Training (YOLO11s)**
+**Model Training (YOLO11s)**
 
 Training is done with:
 
