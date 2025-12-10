@@ -3,7 +3,7 @@
 This notebook provides a complete workflow to train, validate, export, and deploy a custom object detection model for the Caterpillar Autonomy Challenge arena using the YOLO11 architecture.
 It is designed to work entirely inside Google Colab, with seamless integration to Google Drive, custom datasets, and Jetson deployment.
 
-** Features of This Notebook**
+**Features of This Notebook**
 
 ✔ Mount Google Drive to store datasets and model outputs
 ✔ Automatically generate data.yaml from class list
@@ -14,7 +14,7 @@ It is designed to work entirely inside Google Colab, with seamless integration t
 ✔ Ready-to-run Jetson Orin Nano inference script
 ✔ GPU-accelerated training with Colab T4/A100
 
-📁** Dataset Requirements**
+📁**Dataset Requirements**
 
 Dataset must contain:
 
