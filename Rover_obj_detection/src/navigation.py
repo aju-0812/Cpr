@@ -8,7 +8,6 @@ class RoverEnv:
         self.goal_pos = (grid_size[0]-1, grid_size[1]-1)
         self.rover_pos = self.start_pos
         
-        # Actions: 0=Up, 1=Down, 2=Left, 3=Right
         self.action_space = [0, 1, 2, 3]
 
     def reset(self):
@@ -16,46 +15,37 @@ class RoverEnv:
         return self.rover_pos
 
     def set_obstacles(self, obstacles):
-        """
-        obstacles: list of (x, y) tuples
-        """
         self.grid.fill(0)
         for x, y in obstacles:
             if 0 <= x < self.grid_size[0] and 0 <= y < self.grid_size[1]:
-                self.grid[y, x] = 1 # 1 is obstacle
+                self.grid[y, x] = 1 
 
     def step(self, action):
-        """
-        Apply action and return (next_state, reward, done)
-        """
         x, y = self.rover_pos
         
-        if action == 0:   # Up
+        if action == 0:   
             y -= 1
-        elif action == 1: # Down
+        elif action == 1: 
             y += 1
-        elif action == 2: # Left
+        elif action == 2: 
             x -= 1
-        elif action == 3: # Right
+        elif action == 3: 
             x += 1
             
-        # Check boundaries
         x = max(0, min(x, self.grid_size[0] - 1))
         y = max(0, min(y, self.grid_size[1] - 1))
         
         next_pos = (x, y)
         
-        # Rewards
         if next_pos == self.goal_pos:
             reward = 100
             done = True
-        elif self.grid[y, x] == 1: # Obstacle
+        elif self.grid[y, x] == 1: 
             reward = -100
-            done = True # Collision ends episode (or could just be a penalty)
-            # Ensure we don't actually move into the wall
+            done = True 
             next_pos = self.rover_pos 
         else:
-            reward = -1 # Step penalty to encourage shortest path
+            reward = -1 
             done = False
             
         self.rover_pos = next_pos

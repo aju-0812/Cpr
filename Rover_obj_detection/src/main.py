@@ -26,29 +26,23 @@ def train_agent(env, agent, episodes=1000):
     agent.save_model()
 
 def main():
-    # Setup
     env = RoverEnv(grid_size=(20, 20))
     agent = QLearningAgent(actions=env.action_space)
     detector = ObjectDetector()
     
-    # Load existing model if available
     agent.load_model()
     
-    # Mode Selection
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, choices=['train', 'run'], default='run', help='Mode: train or run')
     args = parser.parse_args()
     
     if args.mode == 'train':
-        # Add some static obstacles for training context
-        # In a real scenario, you'd train on random maps
         obstacles = [(5, 5), (5, 6), (5, 7), (10, 10), (10, 11), (12, 12)]
         env.set_obstacles(obstacles)
         train_agent(env, agent, episodes=2000)
-        return # Exit after training
+        return 
 
-    # Inference Mode
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Webcam not found. Using dummy simulation.")
@@ -67,15 +61,11 @@ def main():
             frame = np.zeros((480, 640, 3), dtype=np.uint8)
             cv2.rectangle(frame, (200, 200), (400, 300), (0, 255, 0), -1)
 
-        # 1. Detect
         annotated_frame, detections = detector.detect(frame)
         
-        # 2. Update Environment Obstacles
-        # (Simplified mapping similar to before)
         current_obstacles = []
         for det in detections:
             if det['confidence'] > 0.5:
-                # Map center of view to grid center obstacles
                 bbox = det['bbox']
                 cx = (bbox[0] + bbox[2]) // 2
                 if 200 < cx < 440:
@@ -85,12 +75,8 @@ def main():
         
         env.set_obstacles(current_obstacles)
         
-        # 3. RL Decision
-        # In inference, we want to exploit, so we can set epsilon to 0 temporarily
-        # or just trust the choose_action (which has small epsilon)
         action = agent.choose_action(env.rover_pos)
         
-        # 4. Move
         next_state, reward, done = env.step(action)
         
         if done:
@@ -101,10 +87,8 @@ def main():
                 print("Crashed! Resetting...")
                 env.reset()
 
-        # 5. Visualization
         map_img = np.zeros((env.grid_size[1] * map_scale, env.grid_size[0] * map_scale, 3), dtype=np.uint8)
         
-        # Draw Obstacles
         rows, cols = np.where(env.grid == 1)
         for r, c in zip(rows, cols):
             cv2.rectangle(map_img, 
@@ -112,18 +96,16 @@ def main():
                           ((c+1) * map_scale, (r+1) * map_scale), 
                           (0, 0, 255), -1)
                           
-        # Draw Rover
         rx, ry = env.rover_pos
         cv2.circle(map_img, (rx*map_scale + map_scale//2, ry*map_scale + map_scale//2), 8, (255, 255, 0), -1)
         
-        # Draw Goal
         gx, gy = env.goal_pos
         cv2.circle(map_img, (gx*map_scale + map_scale//2, gy*map_scale + map_scale//2), 8, (255, 0, 255), -1)
 
         cv2.imshow("Rover View", annotated_frame)
         cv2.imshow("RL Map", map_img)
         
-        if cv2.waitKey(100) & 0xFF == ord('q'): # Slower loop for visualization
+        if cv2.waitKey(100) & 0xFF == ord('q'): 
             break
             
     if not use_dummy:

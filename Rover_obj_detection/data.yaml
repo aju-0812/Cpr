@@ -1,0 +1,9 @@
+path: C:\Users\MITHUN\Desktop\STUDIES\PROJECT\36.Caterpiller-AI autonomous rover\Rover_obj_detection\data
+train: train/images
+val: validation/images
+nc: 4
+names:
+- boulders
+- craters
+- obstacles
+- poles
