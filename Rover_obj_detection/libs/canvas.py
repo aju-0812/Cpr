@@ -665,3 +665,4 @@ class Canvas(QWidget):
 
     def set_drawing_shape_to_square(self, status):
         self.draw_square = status
+        
