@@ -5,14 +5,14 @@ It is designed to work entirely inside Google Colab, with seamless integration t
 
 **Features of This Notebook**
 
-✔ Mount Google Drive to store datasets and model outputs
-✔ Automatically generate data.yaml from class list
-✔ Organize dataset into YOLO format (train/val folders)
-✔ Train YOLO11s with custom hyperparameters
-✔ Save trained weights in Google Drive
-✔ Export model to TFLite, ONNX, and TensorRT (engine) formats
-✔ Ready-to-run Jetson Orin Nano inference script
-✔ GPU-accelerated training with Colab T4/A100
+1. Mount Google Drive to store datasets and model outputs
+2. Automatically generate data.yaml from class list
+3. Organize dataset into YOLO format (train/val folders)
+4. Train YOLO11s with custom hyperparameters
+5. Save trained weights in Google Drive
+6. Export model to TFLite, ONNX, and TensorRT (engine) formats
+7. Ready-to-run Jetson Orin Nano inference script
+8. GPU-accelerated training with Colab T4/A100
 
 📁**Dataset Requirements**
 
