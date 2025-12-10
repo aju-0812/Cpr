@@ -1,14 +1,14 @@
-AprilTag Sequential Navigation using OpenCV (Python)
+**AprilTag Sequential Navigation using OpenCV (Python)**
 
 This project implements a sequential navigation system using AprilTags and a normal webcam (OpenCV).
 The program detects AprilTags in a specific order, calculates the rover’s direction (Left / Right / Straight), and marks Mission Complete after all tags are detected in sequence.
 
-Features
-AprilTag Detection
+**Features**
+**AprilTag Detection**
 
 Uses pupil_apriltags for fast and accurate AprilTag detection.
 
-Sequential Navigation Logic
+**Sequential Navigation Logic**
 
 Detects tags in order:
 
@@ -17,7 +17,7 @@ Detects tags in order:
 
 Moves to the next stage only when the correct tag is detected.
 
-Direction Estimation
+**Direction Estimation**
 
 Based on the tag’s X-position in the frame:
 
@@ -27,9 +27,9 @@ TURN RIGHT
 
 GO STRAIGHT
 
-Single Window Output
+**Single Window Output**
 
-Displays:
+**Displays:**
 
 Live camera feed
 
