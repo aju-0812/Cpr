@@ -40,3 +40,64 @@ Navigation direction
 Current target tag
 
 Mission completion message
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+**YOLOv8 Object Detection with Depth Estimation (OAK-D Lite)**
+
+This project integrates YOLOv8 object detection with stereo depth estimation using the Luxonis OAK-D Lite camera.
+The script performs real-time detection, calculates object distance from the depth map, and visualizes results on both RGB and depth windows.
+
+**Features**
+
+Real-time YOLOv8 object detection
+
+Stereo depth map generation using OAK-D Lite
+
+Object distance estimation (in meters) using the center depth pixel
+
+Bounding boxes displayed on both RGB and Depth windows
+
+Colorized depth map for better visualization
+
+Requirements
+
+**Install dependencies:**
+
+pip install depthai ultralytics opencv-python numpy
+
+
+**Download a YOLO model (example uses yolov8s):**
+
+from ultralytics import YOLO
+model = YOLO("yolov8s.pt")
+
+
+**Hardware Required:**
+
+OAK-D Lite or DepthAI stereo camera
+
+
+**How It Works**
+
+YOLOv8 runs on RGB preview frames.
+
+StereoDepth node computes depth in millimeters.
+
+The object’s center pixel is used to estimate distance.
+
+**RGB view shows:**
+
+Bounding box
+
+Object name + distance
+
+**Depth map shows:**
+
+Colorized depth
+
+Bounding box
+
+Center point + distance
