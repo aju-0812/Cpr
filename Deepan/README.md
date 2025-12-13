@@ -1,103 +1,100 @@
-**AprilTag Sequential Navigation using OpenCV (Python)**
+**AprilTag-Based Sequential Navigation System
+Overview**
 
-This project implements a sequential navigation system using AprilTags and a normal webcam (OpenCV).
-The program detects AprilTags in a specific order, calculates the rover’s direction (Left / Right / Straight), and marks Mission Complete after all tags are detected in sequence.
+This project implements a vision-based sequential navigation system using AprilTags and OpenCV.
+A camera detects AprilTags in real time and guides a rover (or robot) through predefined navigation zones by following a fixed tag order.
 
-**Features**
-**AprilTag Detection**
+The system determines whether the rover should turn left, turn right, or move straight based on the horizontal position of the detected AprilTag in the camera frame.
 
-Uses pupil_apriltags for fast and accurate AprilTag detection.
+**Key Features**
 
-**Sequential Navigation Logic**
+✅ Real-time AprilTag detection
 
-Detects tags in order:
+✅ Sequential navigation using predefined tag IDs
 
-2 → 3 → 1
+✅ Direction guidance (LEFT / RIGHT / STRAIGHT)
+
+✅ Visual overlay of tag boundaries, center point, and commands
+
+✅ Single-window display with mission status
+
+✅ Easily extendable to motor control or ROS integration
+
+**Navigation Logic**
+
+The rover must detect AprilTags in a fixed sequence:
+
+NAV_SEQUENCE = [2, 3, 1]
 
 
-Moves to the next stage only when the correct tag is detected.
+The system searches only for the current target tag
 
-**Direction Estimation**
+Once detected, it:
 
-Based on the tag’s X-position in the frame:
+Computes the tag’s center position
 
-TURN LEFT
+Decides movement direction
 
-TURN RIGHT
+Advances to the next navigation stage
 
-GO STRAIGHT
+After all tags are detected → Mission Complete
 
-**Single Window Output**
+**Direction Decision Rule**
 
-**Displays:**
 
-Live camera feed
+The camera frame width is divided into three regions:
 
-AprilTag ID and bounding box
+Tag Position	Rover Action
+Left of center	TURN LEFT
+Right of center	TURN RIGHT
+Near center	GO STRAIGHT
 
-Navigation direction
+Thresholds are defined as:
 
-Current target tag
+LEFT_THRESHOLD  = CENTER_X - 40
+RIGHT_THRESHOLD = CENTER_X + 40
 
-Mission completion message
+**Visual Output**
+
+Each detected tag displays:
+
+Green bounding box
+
+Red center point
+
+Tag ID label
+
+Movement direction
+
+Mission status text
+
+All information is shown in one single display window.
+
+**Requirements**
+
+Install the required Python libraries:
+
+pip install opencv-python numpy pupil-apriltags
+
+Hardware
+
+USB Camera / Laptop Camera
+
+(Optional) Rover platform for motor control
+
+**How to Run**
+
+Connect your camera
+
+Place AprilTags in front of the camera
+
+Run the script:
+
+python April_Detect.py
+
+
+Press q to exit
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-**YOLOv8 Object Detection with Depth Estimation (OAK-D Lite)**
-
-This project integrates YOLOv8 object detection with stereo depth estimation using the Luxonis OAK-D Lite camera.
-The script performs real-time detection, calculates object distance from the depth map, and visualizes results on both RGB and depth windows.
-
-**Features**
-
-Real-time YOLOv8 object detection
-
-Stereo depth map generation using OAK-D Lite
-
-Object distance estimation (in meters) using the center depth pixel
-
-Bounding boxes displayed on both RGB and Depth windows
-
-Colorized depth map for better visualization
-
-Requirements
-
-**Install dependencies:**
-
-pip install depthai ultralytics opencv-python numpy
-
-
-**Download a YOLO model (example uses yolov8s):**
-
-from ultralytics import YOLO
-model = YOLO("yolov8s.pt")
-
-
-**Hardware Required:**
-
-OAK-D Lite or DepthAI stereo camera
-
-
-**How It Works**
-
-YOLOv8 runs on RGB preview frames.
-
-StereoDepth node computes depth in millimeters.
-
-The object’s center pixel is used to estimate distance.
-
-**RGB view shows:**
-
-Bounding box
-
-Object name + distance
-
-**Depth map shows:**
-
-Colorized depth
-
-Bounding box
-
-Center point + distance
