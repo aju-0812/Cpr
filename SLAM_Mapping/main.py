@@ -159,124 +159,141 @@ def main():
 
     initial_plan_made = False
     
-    for step in range(1000):
-        ranges, scan_points = sensor.scan(env, (rover.x, rover.y, rover.theta))
-        
-        grid_map.update_map(rover.x, rover.y, scan_points)
-        
-        if step % 2 == 0 or not initial_plan_made:
-            path = global_planner.plan((rover.x, rover.y), goal_pos)
-            if path:
-                initial_plan_made = True
-        
-        local_obstacles = np.array(scan_points) if len(scan_points) > 0 else np.empty((0, 2))
-        
-        if path and len(path) > 1:
-            lookahead_dist = 4.0
-            target_idx = 0
-            for i, p in enumerate(path):
-                if np.hypot(p[0] - rover.x, p[1] - rover.y) > lookahead_dist:
-                    target_idx = i
-                    break
-            target = path[target_idx]
-        else:
-            target = goal_pos
+    steps_per_frame = 5 # Run 5 simulation steps for every 1 visualization update
+    
+    for step in range(2000): # Increased total steps
+        # Run simulation logic multiple times
+        for _ in range(steps_per_frame):
+            ranges, scan_points = sensor.scan(env, (rover.x, rover.y, rover.theta))
+            grid_map.update_map(rover.x, rover.y, scan_points)
             
-        best_u, _, all_trajectories = local_planner.plan(rover.x, rover.y, rover.theta, rover.v, rover.w, target, local_obstacles)
-        v, w = best_u
-        
-        rover.move(v, w)
-        
-        if step % 2 == 0:
-            ax1.clear()
-            ax2.clear()
+            # Global Planning (less frequent)
+            if step % 10 == 0 or not initial_plan_made:
+                path = global_planner.plan((rover.x, rover.y), goal_pos)
+                if path:
+                    initial_plan_made = True
             
-            ax1.set_title("Global Map & Path History")
-            ax1.imshow(grid_map.get_probability_map(), cmap='Greys', origin='lower', 
-                       extent=[0, 100, 0, 100], vmin=0, vmax=1, alpha=0.5)
+            local_obstacles = np.array(scan_points) if len(scan_points) > 0 else np.empty((0, 2))
             
-            for obs in env.obstacles:
-                if obs['type'] == 'circle':
-                    circle = plt.Circle((obs['x'], obs['y']), obs['r'], color='r', fill=False, alpha=0.3)
-                    ax1.add_patch(circle)
-                elif obs['type'] == 'rect':
-                    rect = plt.Rectangle((obs['x'], obs['y']), obs['w'], obs['h'], color='r', fill=False, alpha=0.3)
-                    ax1.add_patch(rect)
-                elif obs['type'] == 'line':
-                    p1 = obs['p1']
-                    p2 = obs['p2']
-                    ax1.plot([p1[0], p2[0]], [p1[1], p2[1]], 'r-', linewidth=1, alpha=0.3)
-                elif obs['type'] == 'polygon':
-                    poly = plt.Polygon(obs['points'], edgecolor='r', facecolor='none', alpha=0.3)
-                    ax1.add_patch(poly)
-
-            if len(rover.history) > 1:
-                hist_arr = np.array(rover.history)
-                ax1.plot(hist_arr[:, 0], hist_arr[:, 1], 'b-', linewidth=2, label='Path Taken')
-
-            if path:
-                path_arr = np.array(path)
-                ax1.plot(path_arr[:, 0], path_arr[:, 1], 'g--', linewidth=1, label='Global Plan')
-
-            # Draw rover as a car-like shape
-            rover_length = 2.5
-            rover_width = 1.5
-            
-            # Calculate rover corners
-            cos_theta = np.cos(rover.theta)
-            sin_theta = np.sin(rover.theta)
-            
-            # Rover body (rectangle)
-            corners = np.array([
-                [-rover_length/2, -rover_width/2],
-                [rover_length/2, -rover_width/2],
-                [rover_length/2, rover_width/2],
-                [-rover_length/2, rover_width/2]
-            ])
-            
-            # Rotate and translate corners
-            rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
-            rotated_corners = corners @ rotation_matrix.T
-            rotated_corners[:, 0] += rover.x
-            rotated_corners[:, 1] += rover.y
-            
-            # Draw rover body
-            rover_shape = plt.Polygon(rotated_corners, facecolor='blue', edgecolor='darkblue', linewidth=2, alpha=0.8)
-            ax1.add_patch(rover_shape)
-            
-            # Draw direction arrow
-            arrow_length = 2.0
-            ax1.arrow(rover.x, rover.y, arrow_length*cos_theta, arrow_length*sin_theta, 
-                     head_width=0.8, head_length=0.6, fc='yellow', ec='orange', linewidth=2)
-            
-            ax1.plot(start_pos[0], start_pos[1], 'go', markersize=12, label='START')
-            ax1.plot(goal_pos[0], goal_pos[1], 'r*', markersize=15, markeredgewidth=2, label='GOAL')
-            ax1.set_xlim(0, 100)
-            ax1.set_ylim(0, 100)
-            ax1.legend(loc='upper right')
-
-            ax2.set_title("Local Analysis (DWA Trajectories)")
-            ax2.set_xlim(rover.x - 10, rover.x + 10)
-            ax2.set_ylim(rover.y - 10, rover.y + 10)
-            
-            for traj in all_trajectories:
-                ax2.plot(traj[:, 0], traj[:, 1], 'k-', linewidth=0.5, alpha=0.2)
+            if path and len(path) > 1:
+                lookahead_dist = 4.0
+                target_idx = 0
+                for i, p in enumerate(path):
+                    if np.hypot(p[0] - rover.x, p[1] - rover.y) > lookahead_dist:
+                        target_idx = i
+                        break
+                target = path[target_idx]
+            else:
+                target = goal_pos
                 
-            if len(scan_points) > 0:
-                ax2.plot(scan_points[:, 0], scan_points[:, 1], 'r.', markersize=3)
+            best_u, _, all_trajectories = local_planner.plan(rover.x, rover.y, rover.theta, rover.v, rover.w, target, local_obstacles)
+            v, w = best_u
+            rover.move(v, w)
             
-            # Draw rover in local view too
-            rover_shape_local = plt.Polygon(rotated_corners, facecolor='blue', edgecolor='darkblue', linewidth=2, alpha=0.8)
-            ax2.add_patch(rover_shape_local)
-            ax2.arrow(rover.x, rover.y, arrow_length*cos_theta, arrow_length*sin_theta, 
-                     head_width=0.4, head_length=0.3, fc='yellow', ec='orange', linewidth=2)
+            if np.hypot(rover.x - goal_pos[0], rover.y - goal_pos[1]) < 2.0:
+                print("Goal Reached!")
+                plt.ioff()
+                plt.show()
+                return
+
+        # --- VISUALIZE (Once per frame) ---
+        ax1.clear()
+        ax2.clear()
+        
+        ax1.set_title("Global Map & Path History")
+        ax1.imshow(grid_map.get_probability_map(), cmap='Greys', origin='lower', 
+                   extent=[0, 100, 0, 100], vmin=0, vmax=1, alpha=0.5)
+        
+        for obs in env.obstacles:
+            if obs['type'] == 'circle':
+                circle = plt.Circle((obs['x'], obs['y']), obs['r'], color='r', fill=False, alpha=0.3)
+                ax1.add_patch(circle)
+            elif obs['type'] == 'rect':
+                rect = plt.Rectangle((obs['x'], obs['y']), obs['w'], obs['h'], color='r', fill=False, alpha=0.3)
+                ax1.add_patch(rect)
+            elif obs['type'] == 'line':
+                p1 = obs['p1']
+                p2 = obs['p2']
+                ax1.plot([p1[0], p2[0]], [p1[1], p2[1]], 'r-', linewidth=1, alpha=0.3)
+            elif obs['type'] == 'polygon':
+                poly = plt.Polygon(obs['points'], edgecolor='r', facecolor='none', alpha=0.3)
+                ax1.add_patch(poly)
+
+        if len(rover.history) > 1:
+            hist_arr = np.array(rover.history)
+            ax1.plot(hist_arr[:, 0], hist_arr[:, 1], 'b-', linewidth=2, label='Path Taken')
+
+        if path:
+            path_arr = np.array(path)
+            ax1.plot(path_arr[:, 0], path_arr[:, 1], 'g--', linewidth=1, label='Global Plan')
+
+        # Draw rover as a car-like shape
+        rover_length = 2.5
+        rover_width = 1.5
+        
+        cos_theta = np.cos(rover.theta)
+        sin_theta = np.sin(rover.theta)
+        
+        corners = np.array([
+            [-rover_length/2, -rover_width/2],
+            [rover_length/2, -rover_width/2],
+            [rover_length/2, rover_width/2],
+            [-rover_length/2, rover_width/2]
+        ])
+        
+        rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
+        rotated_corners = corners @ rotation_matrix.T
+        rotated_corners[:, 0] += rover.x
+        rotated_corners[:, 1] += rover.y
+        
+        rover_shape = plt.Polygon(rotated_corners, facecolor='blue', edgecolor='darkblue', linewidth=2, alpha=0.8)
+        ax1.add_patch(rover_shape)
+        
+        arrow_length = 2.0
+        ax1.arrow(rover.x, rover.y, arrow_length*cos_theta, arrow_length*sin_theta, 
+                 head_width=0.8, head_length=0.6, fc='yellow', ec='orange', linewidth=2)
+        
+        ax1.plot(start_pos[0], start_pos[1], 'go', markersize=12, label='START')
+        ax1.plot(goal_pos[0], goal_pos[1], 'r*', markersize=15, markeredgewidth=2, label='GOAL')
+        ax1.set_xlim(0, 100)
+        ax1.set_ylim(0, 100)
+        ax1.legend(loc='upper right')
+
+        ax2.set_title("Local Analysis (DWA Trajectories)")
+        ax2.set_xlim(rover.x - 10, rover.x + 10)
+        ax2.set_ylim(rover.y - 10, rover.y + 10)
+        
+        # Plot all candidate trajectories
+        for traj in all_trajectories:
+            ax2.plot(traj[:, 0], traj[:, 1], 'k-', linewidth=0.5, alpha=0.4)
             
-            plt.draw()
-            plt.pause(0.001)
+        # Highlight the CHOSEN trajectory (Best U)
+        # We need to re-simulate the best trajectory to plot it distinctly
+        # Or we can just find it in the list if we stored it, but re-simulating is easy
+        # Actually, let's just plot a predicted trajectory based on v, w
+        # Predict 3 seconds ahead
+        pred_x, pred_y, pred_th = rover.x, rover.y, rover.theta
+        pred_traj = []
+        for _ in range(int(3.0 / 0.1)):
+            pred_x += v * np.cos(pred_th) * 0.1
+            pred_y += v * np.sin(pred_th) * 0.1
+            pred_th += w * 0.1
+            pred_traj.append((pred_x, pred_y))
+        pred_traj = np.array(pred_traj)
+        if len(pred_traj) > 0:
+            ax2.plot(pred_traj[:, 0], pred_traj[:, 1], 'lime', linewidth=3, label='Chosen Path', zorder=10)
             
-        if np.hypot(rover.x - goal_pos[0], rover.y - goal_pos[1]) < 2.0:
-            print("Goal Reached!")
-            break
+        if len(scan_points) > 0:
+            ax2.plot(scan_points[:, 0], scan_points[:, 1], 'r.', markersize=3)
+        
+        rover_shape_local = plt.Polygon(rotated_corners, facecolor='blue', edgecolor='darkblue', linewidth=2, alpha=0.8)
+        ax2.add_patch(rover_shape_local)
+        ax2.arrow(rover.x, rover.y, arrow_length*cos_theta, arrow_length*sin_theta, 
+                 head_width=0.4, head_length=0.3, fc='yellow', ec='orange', linewidth=2)
+        ax2.legend(loc='upper right')
+        
+        plt.draw()
+        plt.pause(0.001)
 
     plt.ioff()
     plt.show()

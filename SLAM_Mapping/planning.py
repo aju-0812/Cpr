@@ -73,7 +73,7 @@ class LocalPlanner:
         self.max_accel = 0.5
         self.max_dyaw_rate = 40.0 * np.pi / 180.0
         self.v_reso = 0.2
-        self.yaw_rate_reso = 0.2 * np.pi / 180.0
+        self.yaw_rate_reso = 1.0 * np.pi / 180.0
         self.dt = 0.1
         self.predict_time = 3.0
         self.to_goal_cost_gain = 0.15
